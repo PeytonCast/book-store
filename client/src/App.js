@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SearchBooks from './pages/SearchBooks';
 import SavedBooks from './pages/SavedBooks';
 import Navbar from './components/Navbar';
-
+import NotFound from './pages/NotFound';
 function App() {
   return (
     <Router>
@@ -20,7 +20,7 @@ function App() {
           />
           <Route 
             path='*'
-            element={<h1 className='display-2'>Wrong page!</h1>}
+            element={<NotFound />}
           />
         </Routes>
       </>
