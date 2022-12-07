@@ -63,16 +63,20 @@ const resolvers = {
           },
           removeBook:  async (parent, {bookId}, context)=> {
             // if ther is a contex.user, continue on else throw err
+            // console.log({context, bookId, parent})
             if(context.user){
                 // typeDef is retunrming a user so i need to return a user
-                const updateUser = await User.findOneAndDelete(
+                try{const updateUser = await User.findOneAndUpdate(
                     // find user id 
                      { _id: context.user._id },
                     //  remove bookId form that user
                      { $pull: { savedBooks: {bookId} } },
                      { new: true }
                     );
-                    return updateUser;
+                    return updateUser;}
+                    catch(err){
+                      console.log({err})
+                    }
             }
             // if user token is not there LOGIN
             throw new AuthenticationError('You need to be logged in!');

@@ -33,21 +33,21 @@ export const ADD_USER = gql`
   }`
 //TODO
 export const SAVE_BOOK = gql`
-  mutation Mutation($saveBookContent3: inputBook!) {
-    saveBook(bookData: $saveBookContent3) {
+mutation SaveBook($bookData: inputBook!) {
+    saveBook(bookData: $bookData) {
       _id
       email
+      username
       savedBooks {
+        authors
         bookId
         description
-        authors
         image
-        link
         title
       }
-      username
     }
   }
+  
 `
 
 export const REMOVE_BOOK = gql`
