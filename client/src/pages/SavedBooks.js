@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap';
 import { useMutation, useQuery } from '@apollo/client';
-import { GET_ME, REMOVE_BOOK } from '../utils/queries';
+import { GET_ME} from '../utils/queries';
+import {REMOVE_BOOK } from "../utils/mutaitons"
 // import { getMe, deleteBook } from '../utils/API';
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
@@ -9,6 +10,7 @@ import { removeBookId } from '../utils/localStorage';
 const SavedBooks = () => {
   const [userData, setUserData] = useState({});
   const {data, loading} = useQuery(GET_ME);
+  const [deleteBook] = useMutation(REMOVE_BOOK)
   // use this to determine if `useEffect()` hook needs to run again
   // const userDataLength = Object.keys(userData).length;
 
@@ -17,14 +19,9 @@ const SavedBooks = () => {
     const getUserData = async () => {
       try {
         const token = Auth.loggedIn() ? Auth.getToken() : null;
-
+        
         if (!token) {
           return false;
-        }
-
-        console.log('getme data response', data.me)
-        if (!data) {
-          throw new Error('cannot get user data');
         }
 
         const user = await data.me
@@ -42,20 +39,23 @@ const SavedBooks = () => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     if (!token) {
-      return false;
+      throw new Error('bad token please login and try again');
     }
 
     try {
-      // const response = await deleteBook(bookId, token);
+      console.log('book id:',bookId)
+      const updatedUser = await deleteBook({variables: {bookId}});
+      console.log('const updatedUser:',updatedUser)
+      if (!bookId) {
+        throw new Error('no bookId provided');
+      }
 
-      // if (!response.ok) {
-        // throw new Error('something went wrong!');
-      // }
 
-      // const updatedUser = await response.json();
-      // setUserData(updatedUser);
+      setUserData(updatedUser);
+      
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
+      window.location.reload();
     } catch (err) {
       console.error(err);
     }
@@ -76,8 +76,9 @@ const SavedBooks = () => {
       <Container>
         <h2>
           {userData.savedBooks
-            ? `Viewing ${userData.savedBooks.length} saved ${userData.savedBooks.length === 1 ? 'book' : 'books'}:`
-            : 'You have no saved books!'}
+            ? `You have ${userData.savedBooks.length} saved ${userData.savedBooks.length === 1 ? 'book' : 'books'}:`
+            : 'You have 0 saved books'
+            }
         </h2>
         <CardColumns>
           {data.me.savedBooks.map((book) => {
